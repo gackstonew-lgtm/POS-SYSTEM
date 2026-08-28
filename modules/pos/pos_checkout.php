@@ -1,0 +1,130 @@
+<?php
+
+declare(strict_types=1);
+
+require_once dirname(__DIR__, 2) . '/app/helpers/auth.php';
+require_role([ROLE_SUPER_ADMIN, ROLE_ADMIN, ROLE_CASHIER]);
+
+require_once dirname(__DIR__, 2) . '/app/components/header.php';
+require_once dirname(__DIR__, 2) . '/app/components/topbar.php';
+require_once dirname(__DIR__, 2) . '/app/components/sidebar.php';
+?>
+
+<main class="pos-shell has-sidebar" data-app-url="<?= htmlspecialchars(rtrim(APP_URL, '/'), ENT_QUOTES, 'UTF-8') ?>" data-csrf-token="<?= htmlspecialchars(csrf_token(), ENT_QUOTES, 'UTF-8') ?>">
+    <section class="product-pane" aria-label="Products">
+        <div class="pane-header">
+            <div class="d-flex align-items-center justify-content-between gap-3">
+                <div>
+                    <h1 class="pane-title">POS Checkout</h1>
+                    <span class="text-muted small">Search, scan, or tap products to add them fast.</span>
+                </div>
+                <span class="status-pill"><i class="bi bi-lightning-charge-fill"></i> Live Sale</span>
+            </div>
+
+            <div class="search-row">
+                <div class="input-group">
+                    <span class="input-group-text bg-white"><i class="bi bi-search"></i></span>
+                    <input
+                        type="search"
+                        id="productSearch"
+                        class="form-control search-input"
+                        placeholder="Search by product name, SKU, or barcode"
+                        autocomplete="off"
+                        autofocus
+                    >
+                </div>
+                <select id="categoryFilter" class="form-select category-select" aria-label="Filter by category">
+                    <option value="">All Categories</option>
+                    <option value="Grocery">Grocery</option>
+                    <option value="Beverages">Beverages</option>
+                    <option value="Household">Household</option>
+                    <option value="Personal Care">Personal Care</option>
+                </select>
+            </div>
+        </div>
+
+        <div id="productGrid" class="product-grid" aria-live="polite">
+            <div class="empty-state">
+                <div>
+                    <div class="spinner-border text-success mb-3" role="status"></div>
+                    <div>Loading products...</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <aside class="cart-pane" aria-label="Shopping cart">
+        <div class="pane-header">
+            <div class="d-flex align-items-start justify-content-between gap-3">
+                <div>
+                    <h2 class="pane-title">Current Cart</h2>
+                    <span id="cartCount" class="text-muted small">No items added</span>
+                </div>
+                <button id="clearCartBtn" type="button" class="btn btn-outline-danger btn-sm">
+                    <i class="bi bi-trash3"></i> Clear
+                </button>
+            </div>
+        </div>
+
+        <div id="cartList" class="cart-list">
+            <div class="empty-state">
+                <div>
+                    <i class="bi bi-cart3 fs-1 d-block mb-2"></i>
+                    Select products to begin a sale.
+                </div>
+            </div>
+        </div>
+
+        <div class="cart-summary">
+            <div class="mb-3">
+                <label for="customerName" class="form-label small fw-bold">Customer</label>
+                <input id="customerName" type="text" class="form-control" placeholder="Walk-in customer">
+            </div>
+
+            <div class="row g-2 mb-3">
+                <div class="col-6">
+                    <label for="globalDiscount" class="form-label small fw-bold">Discount</label>
+                    <input id="globalDiscount" type="number" class="form-control" min="0" step="1" value="0">
+                </div>
+                <div class="col-6">
+                    <label for="mpesaPhone" class="form-label small fw-bold">Mpesa Phone</label>
+                    <input id="mpesaPhone" type="tel" class="form-control" placeholder="2547...">
+                </div>
+            </div>
+
+            <div class="summary-row">
+                <span>Subtotal</span>
+                <strong id="subtotalAmount">KES 0.00</strong>
+            </div>
+            <div class="summary-row">
+                <span>Discount</span>
+                <strong id="discountAmount">KES 0.00</strong>
+            </div>
+            <div class="summary-row">
+                <span>VAT / Tax</span>
+                <strong id="taxAmount">KES 0.00</strong>
+            </div>
+            <div class="summary-row mb-0">
+                <span class="summary-total">Total</span>
+                <strong id="totalAmount" class="summary-total">KES 0.00</strong>
+            </div>
+
+            <div class="checkout-actions">
+                <button id="cashCheckoutBtn" type="button" class="btn btn-ke-primary btn-lg">
+                    <i class="bi bi-cash-stack"></i> Cash
+                </button>
+                <button id="cardCheckoutBtn" type="button" class="btn btn-outline-primary btn-lg">
+                    <i class="bi bi-credit-card"></i> Card
+                </button>
+                <button id="mpesaCheckoutBtn" type="button" class="btn btn-ke-accent btn-lg">
+                    <i class="bi bi-phone"></i> M-PESA
+                </button>
+            </div>
+
+            <div id="checkoutAlert" class="alert mt-3 mb-0 d-none" role="alert"></div>
+        </div>
+    </aside>
+</main>
+
+<script src="<?= htmlspecialchars(rtrim(APP_URL, '/'), ENT_QUOTES, 'UTF-8') ?>/assets/js/pos_checkout.js"></script>
+<?php require_once dirname(__DIR__, 2) . '/app/components/footer.php'; ?>

@@ -1,0 +1,299 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Employee Accounts - Karing Enterprise</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <link href="/assets/css/basics.css" rel="stylesheet">
+    <link href="/assets/css/modules.css" rel="stylesheet">
+    <link href="/assets/css/pos.css" rel="stylesheet">
+</head>
+<body>
+    <div id="appTopbar"></div>
+    <div id="appSidebar"></div>
+
+    <main class="module-shell has-sidebar">
+        <div class="module-page">
+            <div id="flashAlert" class="alert d-none mb-0" role="alert"></div>
+
+            <section class="module-hero">
+                <div>
+                    <h1>Employee Accounts</h1>
+                    <p>Manage staff details, roles, shifts, and employment status.</p>
+                </div>
+                <div class="module-actions">
+                    <a class="btn btn-outline-primary" href="/index.html"><i class="bi bi-house"></i> Dashboard</a>
+                    <button class="btn btn-primary" id="addNewBtn"><i class="bi bi-plus-lg"></i> Add New</button>
+                </div>
+            </section>
+
+            <section class="summary-strip">
+                <article class="summary-tile"><i class="bi bi-person-badge"></i><div><small>Total Records</small><strong id="statTotal">0</strong></div></article>
+                <article class="summary-tile"><i class="bi bi-search"></i><div><small>Search Results</small><strong id="statResults">0</strong></div></article>
+                <article class="summary-tile"><i class="bi bi-file-earmark-text"></i><div><small>Page</small><strong id="statPage">1 / 1</strong></div></article>
+                <article class="summary-tile"><i class="bi bi-shield-check"></i><div><small>Access</small><strong>Admin</strong></div></article>
+            </section>
+
+            <section class="module-grid-2">
+                <div class="module-table-wrap">
+                    <div class="module-panel border-0 border-bottom rounded-0">
+                        <h2>Employee List</h2>
+                        <p>Search, edit, or delete staff records.</p>
+                        <form class="filter-bar" id="searchForm">
+                            <input class="form-control" type="search" id="searchInput" placeholder="Search employees">
+                            <select class="form-select" disabled><option>All Records</option></select>
+                            <button class="btn btn-outline-primary" type="submit"><i class="bi bi-search"></i> Search</button>
+                        </form>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Full Name</th>
+                                    <th>Staff Role</th>
+                                    <th>Phone</th>
+                                    <th>Shift</th>
+                                    <th>Salary</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tableBody">
+                                <tr><td colspan="7" class="text-center text-muted py-4">Loading employees...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="module-panel border-0 border-top rounded-0">
+                        <nav aria-label="Pagination">
+                            <ul class="pagination mb-0" id="pagination"></ul>
+                        </nav>
+                    </div>
+                </div>
+
+                <aside class="module-panel">
+                    <h2 id="formTitle">Add Record</h2>
+                    <p class="mb-3">Fields marked as required must be completed before saving.</p>
+                    <form class="quick-form" id="entityForm">
+                        <input type="hidden" id="recordId" value="0">
+                        <div>
+                            <label for="name">Full Name</label>
+                            <input class="form-control" id="name" name="name" type="text" required placeholder="Employee full name">
+                        </div>
+                        <div>
+                            <label for="role">Staff Role</label>
+                            <input class="form-control" id="role" name="role" type="text" required placeholder="Cashier, Storekeeper, Supervisor, etc.">
+                        </div>
+                        <div>
+                            <label for="phone">Phone</label>
+                            <input class="form-control" id="phone" name="phone" type="text" placeholder="2547...">
+                        </div>
+                        <div>
+                            <label for="email">Email</label>
+                            <input class="form-control" id="email" name="email" type="email" placeholder="staff@example.com">
+                        </div>
+                        <div>
+                            <label for="shift">Shift</label>
+                            <select class="form-select" id="shift" name="shift">
+                                <option value="Morning">Morning</option>
+                                <option value="Day">Day</option>
+                                <option value="Evening">Evening</option>
+                                <option value="Night">Night</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="salary">Salary</label>
+                            <input class="form-control" id="salary" name="salary" type="number" step="0.01" min="0" value="0">
+                        </div>
+                        <div>
+                            <label for="is_active">Active</label>
+                            <select class="form-select" id="is_active" name="is_active">
+                                <option value="1">Yes</option>
+                                <option value="0">No</option>
+                            </select>
+                        </div>
+                        <div class="d-flex gap-2 mt-2">
+                            <button class="btn btn-primary" type="submit" id="saveBtn"><i class="bi bi-save"></i> Save</button>
+                            <button class="btn btn-outline-secondary d-none" type="button" id="cancelBtn">Cancel Edit</button>
+                        </div>
+                    </form>
+                </aside>
+            </section>
+        </div>
+    </main>
+
+    <script src="/assets/js/api.js"></script>
+    <script src="/assets/js/layout.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            KaringLayout.init({ allowedRoles: ['super_admin', 'admin'] });
+
+            const entity = 'employees';
+            let currentPage = 1;
+            let currentSearch = '';
+
+            const tableBody = document.getElementById('tableBody');
+            const pagination = document.getElementById('pagination');
+            const searchForm = document.getElementById('searchForm');
+            const searchInput = document.getElementById('searchInput');
+            const entityForm = document.getElementById('entityForm');
+            const formTitle = document.getElementById('formTitle');
+            const cancelBtn = document.getElementById('cancelBtn');
+            const flashAlert = document.getElementById('flashAlert');
+
+            function showFlash(type, msg) {
+                flashAlert.className = `alert alert-${type} mb-3`;
+                flashAlert.textContent = msg;
+                flashAlert.classList.remove('d-none');
+            }
+
+            async function loadRecords(page = 1, q = '') {
+                currentPage = page;
+                currentSearch = q;
+                tableBody.innerHTML = '<tr><td colspan="7" class="text-center text-muted py-4">Loading...</td></tr>';
+
+                try {
+                    const res = await KaringApi.getEntityList(entity, q, page, 10);
+                    document.getElementById('statTotal').textContent = res.total;
+                    document.getElementById('statResults').textContent = res.rows.length;
+                    document.getElementById('statPage').textContent = `${res.page} / ${res.pages}`;
+
+                    if (!res.rows || res.rows.length === 0) {
+                        tableBody.innerHTML = '<tr><td colspan="7" class="text-center text-muted py-4">No records found.</td></tr>';
+                    } else {
+                        tableBody.innerHTML = res.rows.map((row) => `
+                            <tr>
+                                <td><strong>${KaringLayout.escapeHtml(row.name)}</strong></td>
+                                <td>${KaringLayout.escapeHtml(row.role)}</td>
+                                <td>${KaringLayout.escapeHtml(row.phone || '-')}</td>
+                                <td>${KaringLayout.escapeHtml(row.shift || 'Day')}</td>
+                                <td>${KaringLayout.money(row.salary)}</td>
+                                <td>${Number(row.is_active) === 1 ? '<span class="badge-soft success">Active</span>' : '<span class="badge-soft danger">Disabled</span>'}</td>
+                                <td>
+                                    <div class="d-flex gap-2">
+                                        <button class="btn btn-sm btn-outline-primary edit-btn" data-id="${row.id}">Edit</button>
+                                        <button class="btn btn-sm btn-outline-danger delete-btn" data-id="${row.id}">Delete</button>
+                                    </div>
+                                </td>
+                            </tr>
+                        `).join('');
+                    }
+
+                    renderPagination(res.pages, res.page);
+                } catch (err) {
+                    showFlash('danger', err.message || 'Error loading employees.');
+                }
+            }
+
+            function renderPagination(totalPages, page) {
+                if (totalPages <= 1) {
+                    pagination.innerHTML = '';
+                    return;
+                }
+                let html = '';
+                for (let i = 1; i <= totalPages; i++) {
+                    html += `<li class="page-item ${i === page ? 'active' : ''}"><a class="page-link" href="#" data-page="${i}">${i}</a></li>`;
+                }
+                pagination.innerHTML = html;
+            }
+
+            pagination.addEventListener('click', (e) => {
+                e.preventDefault();
+                const target = e.target.closest('[data-page]');
+                if (target) {
+                    loadRecords(Number(target.dataset.page), currentSearch);
+                }
+            });
+
+            searchForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                loadRecords(1, searchInput.value.trim());
+            });
+
+            document.getElementById('addNewBtn').addEventListener('click', resetForm);
+            cancelBtn.addEventListener('click', resetForm);
+
+            function resetForm() {
+                document.getElementById('recordId').value = '0';
+                entityForm.reset();
+                document.getElementById('shift').value = 'Day';
+                document.getElementById('is_active').value = '1';
+                formTitle.textContent = 'Add Record';
+                cancelBtn.classList.add('d-none');
+            }
+
+            tableBody.addEventListener('click', async (e) => {
+                const editBtn = e.target.closest('.edit-btn');
+                const deleteBtn = e.target.closest('.delete-btn');
+
+                if (editBtn) {
+                    const id = Number(editBtn.dataset.id);
+                    try {
+                        const res = await KaringApi.getEntityRecord(entity, id);
+                        if (res.record) {
+                            const r = res.record;
+                            document.getElementById('recordId').value = r.id;
+                            document.getElementById('name').value = r.name || '';
+                            document.getElementById('role').value = r.role || '';
+                            document.getElementById('phone').value = r.phone || '';
+                            document.getElementById('email').value = r.email || '';
+                            document.getElementById('shift').value = r.shift || 'Day';
+                            document.getElementById('salary').value = r.salary || 0;
+                            document.getElementById('is_active').value = String(r.is_active ?? 1);
+                            formTitle.textContent = 'Edit Record';
+                            cancelBtn.classList.remove('d-none');
+                            window.scrollTo({ top: entityForm.offsetTop - 80, behavior: 'smooth' });
+                        }
+                    } catch (err) {
+                        showFlash('danger', err.message);
+                    }
+                }
+
+                if (deleteBtn) {
+                    if (confirm('Delete this record?')) {
+                        try {
+                            const id = Number(deleteBtn.dataset.id);
+                            const res = await KaringApi.deleteEntityRecord(entity, id);
+                            showFlash('success', res.message || 'Deleted successfully.');
+                            loadRecords(currentPage, currentSearch);
+                        } catch (err) {
+                            showFlash('danger', err.message);
+                        }
+                    }
+                }
+            });
+
+            entityForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const saveBtn = document.getElementById('saveBtn');
+                saveBtn.disabled = true;
+
+                const payload = {
+                    id: Number(document.getElementById('recordId').value || 0),
+                    name: document.getElementById('name').value.trim(),
+                    role: document.getElementById('role').value.trim(),
+                    phone: document.getElementById('phone').value.trim(),
+                    email: document.getElementById('email').value.trim(),
+                    shift: document.getElementById('shift').value,
+                    salary: Number(document.getElementById('salary').value || 0),
+                    is_active: Number(document.getElementById('is_active').value)
+                };
+
+                try {
+                    const res = await KaringApi.saveEntityRecord(entity, payload);
+                    showFlash('success', res.message || 'Saved successfully.');
+                    resetForm();
+                    loadRecords(currentPage, currentSearch);
+                } catch (err) {
+                    showFlash('danger', err.message);
+                } finally {
+                    saveBtn.disabled = false;
+                }
+            });
+
+            loadRecords();
+        });
+    </script>
+</body>
+</html>

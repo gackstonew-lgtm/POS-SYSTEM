@@ -1,0 +1,107 @@
+:root {
+    --bg: #f4f6f8;
+    --surface: #ffffff;
+    --surface-soft: #f9fbfc;
+    --line: #dce3ea;
+    --text: #16202a;
+    --muted: #667483;
+    --primary: #176b5b;
+    --primary-dark: #0f4e43;
+    --accent: #d89a24;
+    --danger: #bc3c3c;
+    --info: #2f6f9f;
+    --shadow: 0 18px 42px rgba(22, 32, 42, .08);
+}
+
+* { box-sizing: border-box; }
+
+body {
+    min-height: 100vh;
+    margin: 0;
+    color: var(--text);
+    background: var(--bg);
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+a { color: inherit; text-decoration: none; }
+
+.btn-primary {
+    --bs-btn-bg: var(--primary);
+    --bs-btn-border-color: var(--primary);
+    --bs-btn-hover-bg: var(--primary-dark);
+    --bs-btn-hover-border-color: var(--primary-dark);
+    font-weight: 800;
+}
+
+.btn-outline-primary {
+    --bs-btn-color: var(--primary);
+    --bs-btn-border-color: var(--primary);
+    --bs-btn-hover-bg: var(--primary);
+    --bs-btn-hover-border-color: var(--primary);
+    font-weight: 800;
+}
+
+.app-sidebar {
+    position: fixed;
+    left: 0;
+    top: 64px;
+    bottom: 0;
+    width: 240px;
+    padding: 14px;
+    overflow-y: auto;
+    background: #111b22;
+    color: #eaf0f4;
+    z-index: 10;
+}
+
+.side-nav {
+    display: grid;
+    gap: 6px;
+}
+
+.side-nav a {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    min-height: 42px;
+    padding: 10px 12px;
+    border-radius: 8px;
+    color: #b9c7d1;
+    font-weight: 700;
+}
+
+.side-nav a:hover {
+    color: #fff;
+    background: rgba(255,255,255,.1);
+}
+
+.has-sidebar {
+    margin-left: 240px;
+}
+
+.login-page {
+    min-height: 100vh;
+    display: grid;
+    place-items: center;
+    padding: 20px;
+}
+
+.login-card {
+    width: min(100%, 430px);
+    padding: 24px;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    box-shadow: var(--shadow);
+}
+
+@media (max-width: 900px) {
+    .app-sidebar {
+        position: static;
+        width: auto;
+    }
+
+    .has-sidebar {
+        margin-left: 0;
+    }
+}

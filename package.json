@@ -1,0 +1,27 @@
+{
+  "name": "karing-enterprise-pos",
+  "version": "1.0.0",
+  "description": "Karing Enterprise POS - Netlify Hosted Retail Management Application",
+  "main": "index.html",
+  "scripts": {
+    "build": "echo 'Building site for Netlify...'",
+    "dev": "netlify dev",
+    "local": "node server.js"
+  },
+  "keywords": [
+    "pos",
+    "retail",
+    "netlify",
+    "serverless",
+    "mpesa"
+  ],
+  "author": "Karing Enterprise",
+  "license": "ISC",
+  "dependencies": {
+    "@supabase/supabase-js": "^2.45.0",
+    "bcryptjs": "^2.4.3",
+    "dotenv": "^17.4.2",
+    "jsonwebtoken": "^9.0.2",
+    "ws": "^8.18.0"
+  }
+}
