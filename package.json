@@ -1,17 +1,16 @@
 {
   "name": "karing-enterprise-pos",
   "version": "1.0.0",
-  "description": "Karing Enterprise POS - Netlify Hosted Retail Management Application",
+  "description": "Karing Enterprise POS - Retail Management Application",
   "main": "index.html",
   "scripts": {
-    "build": "echo 'Building site for Netlify...'",
-    "dev": "netlify dev",
+    "dev": "vercel dev",
     "local": "node server.js"
   },
   "keywords": [
     "pos",
     "retail",
-    "netlify",
+    "vercel",
     "serverless",
     "mpesa"
   ],

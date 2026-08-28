@@ -1,2 +1,12 @@
-# Local Netlify folder
-.netlify
+# Dependencies
+node_modules/
+
+# Local Netlify & Vercel build folders
+.netlify/
+.vercel/
+
+# Environment files & secrets
+.env
+.env.*
+!.env.example
+!env.example

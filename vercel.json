@@ -1,0 +1,28 @@
+{
+  "version": 2,
+  "rewrites": [
+    { "source": "/api/auth/:path*", "destination": "/api/auth" },
+    { "source": "/api/mpesa/stkpush", "destination": "/api/mpesa" },
+    { "source": "/api/mpesa/status", "destination": "/api/mpesa" },
+    { "source": "/api/mpesa/token", "destination": "/api/mpesa" },
+    { "source": "/login", "destination": "/login.html" },
+    { "source": "/modules/pos/pos_checkout.php", "destination": "/modules/pos/pos_checkout.html" },
+    { "source": "/modules/pos/pos_checkout", "destination": "/modules/pos/pos_checkout.html" },
+    { "source": "/modules/inventory/index.php", "destination": "/modules/inventory/index.html" },
+    { "source": "/modules/inventory", "destination": "/modules/inventory/index.html" },
+    { "source": "/modules/customers/index.php", "destination": "/modules/customers/index.html" },
+    { "source": "/modules/customers", "destination": "/modules/customers/index.html" },
+    { "source": "/modules/suppliers/index.php", "destination": "/modules/suppliers/index.html" },
+    { "source": "/modules/suppliers", "destination": "/modules/suppliers/index.html" },
+    { "source": "/modules/employees/index.php", "destination": "/modules/employees/index.html" },
+    { "source": "/modules/employees", "destination": "/modules/employees/index.html" },
+    { "source": "/modules/expenses/index.php", "destination": "/modules/expenses/index.html" },
+    { "source": "/modules/expenses", "destination": "/modules/expenses/index.html" },
+    { "source": "/modules/reports/index.php", "destination": "/modules/reports/index.html" },
+    { "source": "/modules/reports", "destination": "/modules/reports/index.html" },
+    { "source": "/modules/receipts/receipt.php", "destination": "/modules/receipts/receipt.html" },
+    { "source": "/modules/receipts/receipt", "destination": "/modules/receipts/receipt.html" },
+    { "source": "/modules/users/index.php", "destination": "/modules/users/index.html" },
+    { "source": "/modules/users", "destination": "/modules/users/index.html" }
+  ]
+}

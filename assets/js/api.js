@@ -47,7 +47,7 @@
       headers['Authorization'] = `Bearer ${token}`;
     }
 
-    const url = endpoint.startsWith('http') ? endpoint : `/.netlify/functions${endpoint.startsWith('/') ? '' : '/'}${endpoint}`;
+    const url = endpoint.startsWith('http') ? endpoint : `/api${endpoint.startsWith('/') ? '' : '/'}${endpoint}`;
 
     try {
       const response = await fetch(url, {
