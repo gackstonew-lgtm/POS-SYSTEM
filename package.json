@@ -3,10 +3,7 @@
   "version": "1.0.0",
   "description": "Karing Enterprise POS - Retail Management Application",
   "main": "index.html",
-  "scripts": {
-    "dev": "vercel dev",
-    "local": "node server.js"
-  },
+  "scripts": {},
   "keywords": [
     "pos",
     "retail",
@@ -17,7 +14,7 @@
   "author": "Karing Enterprise",
   "license": "ISC",
   "dependencies": {
-    "@supabase/supabase-js": "^2.45.0",
+    "@supabase/supabase-js": "^2.112.4",
     "bcryptjs": "^2.4.3",
     "dotenv": "^17.4.2",
     "jsonwebtoken": "^9.0.2",
