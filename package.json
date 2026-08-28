@@ -4,7 +4,7 @@
   "description": "Karing Enterprise POS - Retail Management Application",
   "main": "index.html",
   "scripts": {
-    "dev": "node -e \"const env={...process.env}; Object.keys(env).forEach(k=>{if(k.startsWith('npm_'))delete env[k];}); const cmd=Buffer.from('dmVyY2Vs','base64').toString(); require('child_process').spawn(cmd, ['dev', '--listen', '3000'], {stdio:'inherit', shell:true, env});\""
+    "dev": "node -e \"const env={...process.env}; Object.keys(env).forEach(k=>{if(k.startsWith('npm_'))delete env[k];}); const cmd=Buffer.from('dmVyY2Vs','base64').toString(); require('child_process').spawn(cmd, ['dev', '--listen', '3000', '--local'], {stdio:'inherit', shell:true, env});\""
   },
   "keywords": [
     "pos",

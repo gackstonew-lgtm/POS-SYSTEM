@@ -33,10 +33,15 @@
     const userName = user ? escapeHtml(user.name) : '';
     const topbarHtml = `
       <nav class="pos-topbar">
-          <a class="topbar-brand-link" href="/index.html">
-              <span class="brand-mark">KE</span>
-              <span class="brand-name">Karing Enterprise</span>
-          </a>
+          <div class="topbar-brand-wrap">
+              <button id="mobileMenuBtn" class="mobile-menu-btn" type="button" aria-label="Open navigation menu" aria-expanded="false" aria-controls="appSidebar">
+                  <i class="bi bi-list" aria-hidden="true"></i>
+              </button>
+              <a class="topbar-brand-link" href="/index.html">
+                  <span class="brand-mark">KE</span>
+                  <span class="brand-name">Karing Enterprise</span>
+              </a>
+          </div>
           <div class="topbar-meta">
               <a href="/modules/pos/pos_checkout.html"><i class="bi bi-cart-check"></i> POS</a>
               <span><i class="bi bi-shop"></i> Main Branch</span>
@@ -58,6 +63,70 @@
         window.KaringApi.logout();
       });
     }
+
+    setupMobileMenuToggle();
+  }
+
+  function setupMobileMenuToggle() {
+    const btn = document.getElementById('mobileMenuBtn');
+    const sidebar = document.getElementById('appSidebar');
+    if (!btn || !sidebar) return;
+
+    function openMenu() {
+      btn.setAttribute('aria-expanded', 'true');
+      btn.setAttribute('aria-label', 'Close navigation menu');
+      btn.innerHTML = '<i class="bi bi-x-lg" aria-hidden="true"></i>';
+      document.body.classList.add('mobile-nav-open');
+    }
+
+    function closeMenu() {
+      btn.setAttribute('aria-expanded', 'false');
+      btn.setAttribute('aria-label', 'Open navigation menu');
+      btn.innerHTML = '<i class="bi bi-list" aria-hidden="true"></i>';
+      document.body.classList.remove('mobile-nav-open');
+    }
+
+    function toggleMenu() {
+      const isExpanded = btn.getAttribute('aria-expanded') === 'true';
+      if (isExpanded) {
+        closeMenu();
+      } else {
+        openMenu();
+      }
+    }
+
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      toggleMenu();
+    });
+
+    document.addEventListener('click', (e) => {
+      if (document.body.classList.contains('mobile-nav-open')) {
+        if (!sidebar.contains(e.target) && !btn.contains(e.target)) {
+          closeMenu();
+        }
+      }
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && document.body.classList.contains('mobile-nav-open')) {
+        closeMenu();
+        btn.focus();
+      }
+    });
+
+    sidebar.addEventListener('click', (e) => {
+      const link = e.target.closest('a');
+      if (link) {
+        closeMenu();
+      }
+    });
+
+    window.addEventListener('resize', () => {
+      if (window.innerWidth > 900 && document.body.classList.contains('mobile-nav-open')) {
+        closeMenu();
+      }
+    });
   }
 
   function renderSidebar(user) {
