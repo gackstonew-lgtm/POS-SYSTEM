@@ -49,15 +49,31 @@
             </section>
 
             <section class="module-table-wrap">
-                <div class="module-panel border-0 border-bottom rounded-0">
-                    <h2>M-PESA Transaction History</h2>
-                    <p id="mpesaSummaryText">Loading transactions...</p>
+                <div class="module-panel border-0 border-bottom rounded-0 d-flex justify-content-between align-items-center flex-wrap gap-2">
+                    <div>
+                        <h2>Successful Products Sold</h2>
+                        <p id="soldProductsSummaryText" class="mb-0">Loading sold products...</p>
+                    </div>
+                    <div class="d-flex align-items-center gap-2">
+                        <span class="badge bg-success" id="soldProductsCount">0 items</span>
+                    </div>
                 </div>
                 <div class="table-responsive">
-                    <table class="table table-hover">
-                        <thead><tr><th>Sale</th><th>Receipt</th><th>Phone</th><th>Amount</th><th>Status</th><th>Cashier</th><th>Result</th><th>Date</th></tr></thead>
-                        <tbody id="mpesaTableBody">
-                            <tr><td colspan="8" class="text-center text-muted py-4">Loading M-PESA transactions...</td></tr>
+                    <table class="table table-hover align-middle">
+                        <thead>
+                            <tr>
+                                <th>Product</th>
+                                <th>Quantity</th>
+                                <th>Amount</th>
+                                <th>Transaction Type</th>
+                                <th>Date</th>
+                                <th>Time</th>
+                                <th>Cashier</th>
+                                <th>Sale Ref</th>
+                            </tr>
+                        </thead>
+                        <tbody id="soldProductsBody">
+                            <tr><td colspan="8" class="text-center text-muted py-4">Loading sold products...</td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -77,6 +93,21 @@
                     </table>
                 </div>
             </section>
+
+            <section class="module-table-wrap">
+                <div class="module-panel border-0 border-bottom rounded-0">
+                    <h2>M-PESA Transaction History</h2>
+                    <p id="mpesaSummaryText">Loading transactions...</p>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead><tr><th>Sale</th><th>Receipt</th><th>Phone</th><th>Amount</th><th>Status</th><th>Cashier</th><th>Result</th><th>Date</th></tr></thead>
+                        <tbody id="mpesaTableBody">
+                            <tr><td colspan="8" class="text-center text-muted py-4">Loading M-PESA transactions...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
         </div>
     </main>
 
@@ -87,8 +118,11 @@
             KaringLayout.init({ allowedRoles: ['super_admin', 'admin'] });
 
             const now = new Date();
-            const firstDay = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().slice(0, 10);
-            const today = now.toISOString().slice(0, 10);
+            const year = now.getFullYear();
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const day = String(now.getDate()).padStart(2, '0');
+            const firstDay = `${year}-${month}-01`;
+            const today = `${year}-${month}-${day}`;
 
             const fromInput = document.getElementById('fromDate');
             const toInput = document.getElementById('toDate');
@@ -142,6 +176,40 @@
                     document.getElementById('failedMpesa').textContent = data.mpesa.failedMpesa;
 
                     document.getElementById('mpesaSummaryText').textContent = `Total in filter: ${KaringLayout.money(data.mpesa.summary.total)} across ${data.mpesa.summary.count} transaction(s).`;
+
+                    const soldBody = document.getElementById('soldProductsBody');
+                    const soldCount = document.getElementById('soldProductsCount');
+                    const soldSummary = document.getElementById('soldProductsSummaryText');
+
+                    if (!data.soldProducts || data.soldProducts.length === 0) {
+                        soldBody.innerHTML = '<tr><td colspan="8" class="text-center text-muted py-4">No successful product sales found for this period.</td></tr>';
+                        if (soldCount) soldCount.textContent = '0 items';
+                        if (soldSummary) soldSummary.textContent = 'No successful product transactions for the selected period.';
+                    } else {
+                        const totalQty = Number(data.soldProducts.reduce((sum, p) => sum + Number(p.quantity), 0).toFixed(4));
+                        const totalAmount = data.soldProducts.reduce((sum, p) => sum + Number(p.amount), 0);
+                        if (soldCount) soldCount.textContent = `${data.soldProducts.length} item${data.soldProducts.length === 1 ? '' : 's'}`;
+                        if (soldSummary) soldSummary.textContent = `Total of ${totalQty} units sold worth ${KaringLayout.money(totalAmount)} across ${data.soldProducts.length} successful transaction item(s).`;
+
+                        soldBody.innerHTML = data.soldProducts.map((p) => {
+                            let payBadge = 'bg-primary';
+                            if (p.payment_type === 'M-PESA') payBadge = 'bg-success';
+                            else if (p.payment_type === 'Card') payBadge = 'bg-info text-dark';
+
+                            return `
+                                <tr>
+                                    <td><strong>${KaringLayout.escapeHtml(p.product_name)}</strong></td>
+                                    <td><span class="fw-semibold">${Number(p.quantity)}</span></td>
+                                    <td><strong>${KaringLayout.money(p.amount)}</strong></td>
+                                    <td><span class="badge ${payBadge}">${KaringLayout.escapeHtml(p.payment_type)}</span></td>
+                                    <td>${KaringLayout.escapeHtml(p.date)}</td>
+                                    <td>${KaringLayout.escapeHtml(p.time)}</td>
+                                    <td>${KaringLayout.escapeHtml(p.cashier_name || '-')}</td>
+                                    <td><span class="text-muted small">${KaringLayout.escapeHtml(p.sale_reference || '-')}</span></td>
+                                </tr>
+                            `;
+                        }).join('');
+                    }
 
                     const mpesaBody = document.getElementById('mpesaTableBody');
                     if (!data.mpesa.transactions || data.mpesa.transactions.length === 0) {

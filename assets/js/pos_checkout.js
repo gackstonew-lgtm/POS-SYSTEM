@@ -132,7 +132,7 @@
         if (!product) return;
 
         const existing = state.cart.get(product.id);
-        const nextQuantity = existing ? existing.quantity + 1 : 1;
+        const nextQuantity = existing ? Number((existing.quantity + 1).toFixed(4)) : 1;
 
         if (nextQuantity > Number(product.stock)) {
             showAlert('warning', 'Not enough stock available for this product.');
@@ -157,7 +157,9 @@
         const item = state.cart.get(Number(productId));
         if (!item) return;
 
-        const safeQuantity = Math.max(1, Math.min(Number(quantity || 1), item.stock));
+        const rawQty = Number(quantity);
+        if (isNaN(rawQty) || rawQty <= 0) return;
+        const safeQuantity = Number(Math.min(Math.max(0.001, rawQty), item.stock).toFixed(4));
         item.quantity = safeQuantity;
         state.cart.set(item.id, item);
         renderCart();
@@ -204,7 +206,7 @@
                     </div>
                     <div class="qty-control" aria-label="Quantity for ${escapeHtml(item.name)}">
                         <button type="button" data-qty-action="decrease">-</button>
-                        <input type="number" min="1" max="${item.stock}" value="${item.quantity}" data-qty-input>
+                        <input type="number" min="0.001" step="any" max="${item.stock}" value="${item.quantity}" data-qty-input>
                         <button type="button" data-qty-action="increase">+</button>
                     </div>
                     <button type="button" class="remove-btn" data-remove-item aria-label="Remove ${escapeHtml(item.name)}">
@@ -212,7 +214,7 @@
                     </button>
                 </div>
             `).join('');
-            const count = items.reduce((sum, item) => sum + item.quantity, 0);
+            const count = Number(items.reduce((sum, item) => sum + item.quantity, 0).toFixed(4));
             if (els.cartCount) els.cartCount.textContent = `${count} item${count === 1 ? '' : 's'} in cart`;
         }
 
@@ -384,10 +386,10 @@
 
             const action = event.target.dataset.qtyAction;
             if (action === 'increase') {
-                updateCartQuantity(productId, item.quantity + 0.25);
+                updateCartQuantity(productId, Number((item.quantity + 0.25).toFixed(4)));
             }
             if (action === 'decrease') {
-                updateCartQuantity(productId, item.quantity - 0.25);
+                updateCartQuantity(productId, Number((item.quantity - 0.25).toFixed(4)));
             }
         });
 
